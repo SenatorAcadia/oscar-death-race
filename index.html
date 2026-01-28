@@ -10,8 +10,8 @@
             --gold-light: #F3E5AB;
             --gold-mid: #D4AF37;
             --gold-dark: #8A6E2F;
-            --will-color: #4CAF50; /* Green for Will Win */
-            --should-color: #2196F3; /* Blue for Should Win */
+            --will-color: #4CAF50;
+            --should-color: #2196F3;
             --bg-black: #050505;
             --card-bg: #121212;
             --text-white: #f0f0f0;
@@ -25,7 +25,6 @@
             margin: 0; padding: 0; min-height: 100vh;
         }
 
-        /* Modal Styling */
         #infoModal {
             display: none;
             position: fixed;
@@ -59,7 +58,6 @@
             border-radius: 5px;
         }
 
-        /* Header Image Styling */
         .header-container {
             width: 100%;
             border-bottom: 5px solid var(--gold-mid);
@@ -145,7 +143,7 @@
         .category-header { background: linear-gradient(to bottom, #2a2a2a, #121212); padding: 15px; border-bottom: 1px solid #333; }
         .category-card h2 { color: var(--gold-mid); font-family: 'Playfair Display', serif; font-size: 1.2rem; margin: 0; text-align: center; text-transform: uppercase; }
 
-        .nominee-row { display: flex; align-items: center; padding: 10px 10px; border-bottom: 1px solid #222; gap: 5px; }
+        .nominee-row { display: flex; align-items: center; padding: 10px 10px; border-bottom: 1px solid #222; gap: 5px; transition: background 0.2s; }
         .nominee-row.seen { background-color: rgba(212, 175, 55, 0.08); }
         .nominee-row.seen .nominee-info { color: var(--gold-light); font-weight: bold; }
 
@@ -154,18 +152,14 @@
         .action-col { display: flex; flex-direction: column; align-items: center; min-width: 35px; }
         .action-label { font-size: 0.55rem; color: var(--gold-dark); margin-bottom: 3px; font-weight: 900; text-align: center; }
 
-        /* Custom inputs */
         input[type="checkbox"], input[type="radio"] { appearance: none; width: 20px; height: 20px; border: 2px solid #444; cursor: pointer; position: relative; background: #000; margin: 0; }
         input[type="checkbox"] { border-radius: 3px; }
         input[type="radio"] { border-radius: 50%; }
 
-        /* Seen Checkbox */
         input[type="checkbox"]:checked { background: var(--gold-mid); border-color: var(--gold-light); box-shadow: 0 0 8px var(--gold-mid); }
         input[type="checkbox"]:checked::after { content: '✓'; position: absolute; color: #000; font-weight: 900; left: 3px; top: -2px; font-size: 14px; }
 
-        /* Will Win Radio */
         .radio-will:checked { background: var(--will-color); border-color: #fff; box-shadow: 0 0 8px var(--will-color); }
-        /* Should Win Radio */
         .radio-should:checked { background: var(--should-color); border-color: #fff; box-shadow: 0 0 8px var(--should-color); }
 
         .cat-footer { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #0a0a0a; border-top: 1px solid #222; }
@@ -185,7 +179,6 @@
 
         @media (max-width: 600px) { 
             .ballot-grid { grid-template-columns: 1fr; }
-            .nominee-info { font-size: 0.8rem; }
         }
     </style>
 </head>
@@ -195,7 +188,7 @@
         <div class="modal-content">
             <h2>Welcome to the Race</h2>
             <p>Your progress is saved <strong>automatically</strong> to this browser.</p>
-            <p style="font-size: 0.9rem; color: #888;">Note: If you clear your browser data or switch devices, your progress will be lost.</p>
+            <p style="font-size: 0.9rem; color: #888;">Note: Progress is unique to this browser and device.</p>
             <button class="modal-btn" onclick="closeModal()">Enter the Race</button>
             <div style="margin-top: 15px; font-size: 0.8rem; color: #666;">
                 <input type="checkbox" id="dontShow"> <label for="dontShow">Don't show this again</label>
@@ -204,7 +197,6 @@
     </div>
 
     <div class="header-container">
-        <!-- Using the raw URL from your GitHub repo -->
         <img src="https://raw.githubusercontent.com/SenatorAcadia/oscar-death-race/main/header.png" alt="Oscar Death Race 2026" class="header-img">
     </div>
 
@@ -254,22 +246,35 @@
             { category: "Best Visual Effects", nominees: ["Avatar: Fire and Ash", "F1", "Jurassic World Rebirth", "The Lost Bus", "Sinners"] }
         ];
 
-        // Storage structure: { name: "", seen: [], votesWill: {}, votesShould: {} }
-        let userData = JSON.parse(localStorage.getItem('oscarDeathRace2026_v2')) || { 
-            name: "", 
-            seen: [], 
-            votesWill: {}, 
-            votesShould: {} 
+        // MASTER MOVIE LIST (To improve matching accuracy)
+        const MASTER_MOVIES = [
+            "Sinners", "Frankenstein", "Hamnet", "Bugonia", "Marty Supreme", 
+            "One Battle after Another", "F1", "The Secret Agent", "Sentimental Value", 
+            "Train Dreams", "Blue Moon", "It Was Just an Accident", "Sirat", 
+            "Relentless", "Song Sung Blue", "Avatar: Fire and Ash", "Jurassic World Rebirth",
+            "The Lost Bus", "The Smashing Machine", "Kokuho", "The Ugly Stepsister",
+            "Arco", "Elio", "KPop Demon Hunters", "Zootopia 2"
+        ];
+
+        let userData = JSON.parse(localStorage.getItem('oscarDeathRace2026_final')) || { 
+            name: "", seen: [], votesWill: {}, votesShould: {} 
         };
 
-        function getMovieTitle(nominee, category) {
-            const performanceCats = ["Best Director", "Best Actor", "Best Supporting Actor", "Best Actress", "Best Supporting Actress", "Best Casting", "Best Cinematography", "Best Film Editing", "Best Original Score", "Best Original Song"];
-            let title = nominee;
-            if (performanceCats.includes(category)) {
-                const match = nominee.match(/\(([^)]+)\)/);
-                if (match) title = match[1];
+        // NEW ROBUST TITLE PARSER
+        function getMovieTitle(nominee) {
+            // Priority 1: Check if any part of the string matches a master movie title
+            for (let movie of MASTER_MOVIES) {
+                if (nominee.includes(movie)) return movie;
             }
-            if (title.includes('(')) title = title.split('(')[0];
+
+            // Priority 2: Traditional parsing for items not in the master list
+            let title = nominee;
+            if (nominee.includes('(')) {
+                // If there's a parenthesis, try both sides
+                const parts = nominee.split(/[()]/).filter(p => p.trim().length > 0);
+                // Usually the movie is the one with multiple words or the one that isn't a known studio name
+                title = parts.length > 1 ? parts[0].trim() : parts[0].trim();
+            }
             return title.trim();
         }
 
@@ -298,7 +303,7 @@
                 let seenInCat = 0;
                 
                 let nomineesHtml = cat.nominees.map(nom => {
-                    const movieTitle = getMovieTitle(nom, cat.category);
+                    const movieTitle = getMovieTitle(nom);
                     const isSeen = userData.seen.includes(movieTitle);
                     if(isSeen) seenInCat++;
                     
@@ -328,7 +333,7 @@
                     <div class="nominee-list">${nomineesHtml}</div>
                     <div class="cat-footer">
                         <div class="cat-stats">${seenInCat} / ${cat.nominees.length} SEEN</div>
-                        <button class="reset-btn" onclick="resetCategory('${cat.category}')">Reset Category</button>
+                        <button class="reset-btn" onclick="resetCategory('${cat.category}')">Reset</button>
                     </div>`;
                 ballotEl.appendChild(card);
             });
@@ -358,18 +363,27 @@
 
         function saveData() {
             userData.name = document.getElementById('userName').value;
-            localStorage.setItem('oscarDeathRace2026_v2', JSON.stringify(userData));
+            localStorage.setItem('oscarDeathRace2026_final', JSON.stringify(userData));
         }
 
         function updateStats() {
-            const allMovies = new Set();
-            ballotData.forEach(c => c.nominees.forEach(n => allMovies.add(getMovieTitle(n, c.category))));
-            const totalUnique = allMovies.size;
-            const totalSeen = userData.seen.length;
-            const percentage = Math.round((totalSeen / totalUnique) * 100) || 0;
+            // Calculate strictly UNIQUE movie titles across all nominees
+            const uniqueMovieTitles = new Set();
+            ballotData.forEach(cat => {
+                cat.nominees.forEach(nom => {
+                    uniqueMovieTitles.add(getMovieTitle(nom));
+                });
+            });
+
+            const totalUniqueCount = uniqueMovieTitles.size;
+            const seenCount = userData.seen.length;
+            const percentage = Math.round((seenCount / totalUniqueCount) * 100) || 0;
+
             document.getElementById('mainProgressBar').style.width = percentage + '%';
             document.getElementById('progressText').innerText = `${percentage}% COMPLETE`;
-            document.getElementById('seenCount').innerText = totalSeen;
+            document.getElementById('seenCount').innerText = seenCount;
+            // Add a little subtitle with the true total for clarity
+            document.getElementById('seenCount').parentNode.innerHTML = `<span id="seenCount">${seenCount}</span> / ${totalUniqueCount} UNIQUE MOVIES WATCHED`;
         }
 
         init();
