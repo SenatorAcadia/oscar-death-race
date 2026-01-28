@@ -23,6 +23,49 @@
             margin: 0; padding: 0; min-height: 100vh;
         }
 
+        /* Modal / Popup Styling */
+        #infoModal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.9);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: #1a1a1a;
+            margin: 10% auto;
+            padding: 30px;
+            border: 2px solid var(--gold-mid);
+            width: 90%;
+            max-width: 500px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 0 30px var(--gold-dark);
+        }
+
+        .modal-content h2 { font-family: 'Playfair Display', serif; color: var(--gold-mid); margin-top: 0; }
+        .modal-content p { line-height: 1.6; color: #ccc; }
+
+        .modal-btn {
+            background: var(--gold-mid);
+            color: black;
+            border: none;
+            padding: 12px 25px;
+            font-weight: bold;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            text-transform: uppercase;
+        }
+
+        .modal-btn:hover { background: var(--gold-light); }
+
+        .dont-show-container { margin-top: 15px; font-size: 0.8rem; color: #888; }
+
+        /* Main UI Styling */
         .header-container {
             width: 100%;
             border-bottom: 5px solid var(--gold-mid);
@@ -108,56 +151,20 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
 
-        .category-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
-            border-color: var(--gold-mid);
-        }
+        .category-header { background: linear-gradient(to bottom, #2a2a2a, #121212); padding: 20px; border-bottom: 1px solid #333; }
+        .category-card h2 { color: var(--gold-mid); font-family: 'Playfair Display', serif; font-size: 1.4rem; margin: 0; text-align: center; text-transform: uppercase; }
 
-        .category-header {
-            background: linear-gradient(to bottom, #2a2a2a, #121212);
-            padding: 20px;
-            border-bottom: 1px solid #333;
-        }
-
-        .category-card h2 {
-            color: var(--gold-mid);
-            font-family: 'Playfair Display', serif;
-            font-size: 1.4rem;
-            margin: 0;
-            text-align: center;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .nominee-row {
-            display: flex;
-            align-items: center;
-            padding: 12px 15px;
-            border-bottom: 1px solid #222;
-            transition: background 0.2s;
-        }
-
+        .nominee-row { display: flex; align-items: center; padding: 12px 15px; border-bottom: 1px solid #222; }
         .nominee-row.seen { background-color: rgba(212, 175, 55, 0.08); }
         .nominee-row.seen .nominee-info { color: var(--gold-light); font-weight: bold; }
 
         .nominee-info { flex-grow: 1; padding: 0 15px; font-size: 0.95rem; color: #ccc; }
-
         .action-col { display: flex; flex-direction: column; align-items: center; min-width: 45px; }
         .action-label { font-size: 0.6rem; color: var(--gold-dark); margin-bottom: 5px; font-weight: 900; }
 
-        input[type="checkbox"], input[type="radio"] {
-            appearance: none; width: 22px; height: 22px; border: 2px solid #444; cursor: pointer; position: relative; background: #000;
-        }
-        input[type="checkbox"] { border-radius: 4px; }
-        input[type="radio"] { border-radius: 50%; }
-
-        input[type="checkbox"]:checked, input[type="radio"]:checked {
-            background: var(--gold-mid); border-color: var(--gold-light); box-shadow: 0 0 10px var(--gold-mid);
-        }
-        input[type="checkbox"]:checked::after {
-            content: '✓'; position: absolute; color: #000; font-weight: 900; left: 4px; top: -1px;
-        }
+        input[type="checkbox"], input[type="radio"] { appearance: none; width: 22px; height: 22px; border: 2px solid #444; cursor: pointer; position: relative; background: #000; }
+        input[type="checkbox"]:checked, input[type="radio"]:checked { background: var(--gold-mid); border-color: var(--gold-light); box-shadow: 0 0 10px var(--gold-mid); }
+        input[type="checkbox"]:checked::after { content: '✓'; position: absolute; color: #000; font-weight: 900; left: 4px; top: -1px; }
 
         .cat-stats { text-align: center; font-size: 0.8rem; color: #777; padding: 8px; background: #0a0a0a; border-top: 1px solid #222; }
 
@@ -166,9 +173,22 @@
 </head>
 <body>
 
+    <!-- Popup Modal -->
+    <div id="infoModal">
+        <div class="modal-content">
+            <h2>Welcome to the Race</h2>
+            <p>Your progress is saved <strong>automatically</strong> to this browser's local storage.</p>
+            <p style="font-size: 0.9rem;">⚠️ Note: If you switch browsers, use Incognito mode, or clear your browser cache/cookies, your data will be reset.</p>
+            <button class="modal-btn" onclick="closeModal()">Enter the Race</button>
+            <div class="dont-show-container">
+                <input type="checkbox" id="dontShow"> <label for="dontShow">Don't show this again</label>
+            </div>
+        </div>
+    </div>
+
     <div class="header-container">
         <!-- Re-add your actual header image URL here -->
-        <img src="header.png" alt="Oscar Death Race 2026" class="header-img">
+        <img src="YOUR_HEADER_IMAGE_URL_HERE" alt="Oscar Death Race 2026" class="header-img">
     </div>
 
     <div class="container">
@@ -186,7 +206,6 @@
         </div>
 
         <div id="ballot" class="ballot-grid"></div>
-
         <p style="text-align: center; color: #444; margin: 40px 0;">MARCH 15, 2026</p>
     </div>
 
@@ -220,11 +239,8 @@
 
         let userData = JSON.parse(localStorage.getItem('oscarDeathRace2026_Global')) || { name: "", seen: [], votes: {} };
 
-        // THE NORMALIZATION ENGINE
-        // Extracts "Sinners" from "Michael B. Jordan (Sinners)" or "Sinners (Warner Bros.)"
         function getMovieTitle(nominee, category) {
             const performanceCats = ["Best Director", "Best Actor", "Best Supporting Actor", "Best Actress", "Best Supporting Actress", "Best Casting", "Best Cinematography", "Best Film Editing", "Best Original Score", "Best Original Song"];
-            
             let title = nominee;
             if (performanceCats.includes(category)) {
                 const match = nominee.match(/\(([^)]+)\)/);
@@ -235,27 +251,34 @@
         }
 
         function init() {
+            // Check Modal status
+            if (localStorage.getItem('hideOscarModal') !== 'true') {
+                document.getElementById('infoModal').style.display = 'block';
+            }
             document.getElementById('userName').value = userData.name;
             renderBallot();
             updateStats();
         }
 
+        function closeModal() {
+            if (document.getElementById('dontShow').checked) {
+                localStorage.setItem('hideOscarModal', 'true');
+            }
+            document.getElementById('infoModal').style.display = 'none';
+        }
+
         function renderBallot() {
             const ballotEl = document.getElementById('ballot');
             ballotEl.innerHTML = '';
-
             ballotData.forEach((cat, catIdx) => {
                 const card = document.createElement('div');
                 card.className = 'category-card';
-                
                 let seenInCat = 0;
                 let nomineesHtml = cat.nominees.map(nom => {
                     const movieTitle = getMovieTitle(nom, cat.category);
                     const isSeen = userData.seen.includes(movieTitle);
                     if(isSeen) seenInCat++;
-
                     const isVoted = userData.votes[cat.category] === nom;
-                    
                     return `
                         <div class="nominee-row ${isSeen ? 'seen' : ''}">
                             <div class="action-col">
@@ -269,7 +292,6 @@
                             </div>
                         </div>`;
                 }).join('');
-
                 card.innerHTML = `
                     <div class="category-header"><h2>${cat.category}</h2></div>
                     <div class="nominee-list">${nomineesHtml}</div>
@@ -283,7 +305,7 @@
             if (index > -1) { userData.seen.splice(index, 1); } 
             else { userData.seen.push(movieTitle); }
             saveData();
-            renderBallot(); // Re-render updates all instances of this movie
+            renderBallot();
             updateStats();
         }
 
@@ -300,11 +322,9 @@
         function updateStats() {
             const allMovies = new Set();
             ballotData.forEach(c => c.nominees.forEach(n => allMovies.add(getMovieTitle(n, c.category))));
-            
             const totalUnique = allMovies.size;
             const totalSeen = userData.seen.length;
             const percentage = Math.round((totalSeen / totalUnique) * 100) || 0;
-
             document.getElementById('mainProgressBar').style.width = percentage + '%';
             document.getElementById('progressText').innerText = `${percentage}% COMPLETE`;
             document.getElementById('seenCount').innerText = totalSeen;
