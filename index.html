@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oscar Death Race 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold-light: #F3E5AB;
+            --gold-mid: #D4AF37;
+            --gold-dark: #8A6E2F;
+            --bg-black: #050505;
+            --card-bg: #121212;
+            --text-white: #f0f0f0;
+        }
+
+        body {
+            background-color: var(--bg-black);
+            background-image: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
+            color: var(--text-white);
+            font-family: 'Roboto', sans-serif;
+            margin: 0; padding: 0; min-height: 100vh;
+        }
+
+        .header-container {
+            width: 100%;
+            border-bottom: 5px solid var(--gold-mid);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.4);
+        }
+        
+        .header-img { width: 100%; height: auto; display: block; }
+
+        .container { max-width: 1300px; margin: 0 auto; padding: 20px; }
+
+        .user-section {
+            background: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid var(--gold-dark);
+            margin-bottom: 40px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+
+        input[type="text"] {
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid var(--gold-mid);
+            color: var(--gold-light);
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            text-align: center;
+            outline: none;
+            width: 90%;
+            max-width: 600px;
+            margin-bottom: 25px;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+        }
+
+        .overall-progress-label {
+            font-family: 'Playfair Display', serif;
+            color: var(--gold-mid);
+            font-size: 1.4rem;
+            font-weight: 900;
+            margin-bottom: 12px;
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .progress-container {
+            background: #222;
+            border-radius: 50px;
+            height: 35px;
+            width: 100%;
+            overflow: hidden;
+            border: 2px solid var(--gold-dark);
+            box-shadow: inset 0 0 10px #000;
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, var(--gold-dark), var(--gold-mid), var(--gold-light), var(--gold-mid));
+            background-size: 200% 100%;
+            height: 100%;
+            width: 0%;
+            transition: width 0.8s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+            animation: shimmer 3s infinite linear;
+        }
+
+        @keyframes shimmer { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
+
+        .ballot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 30px;
+        }
+
+        .category-card {
+            background: var(--card-bg);
+            border: 1px solid #333;
+            border-top: 5px solid var(--gold-mid);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+            border-color: var(--gold-mid);
+        }
+
+        .category-header {
+            background: linear-gradient(to bottom, #2a2a2a, #121212);
+            padding: 20px;
+            border-bottom: 1px solid #333;
+        }
+
+        .category-card h2 {
+            color: var(--gold-mid);
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            margin: 0;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nominee-row {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-bottom: 1px solid #222;
+            transition: background 0.2s;
+        }
+
+        .nominee-row.seen { background-color: rgba(212, 175, 55, 0.08); }
+        .nominee-row.seen .nominee-info { color: var(--gold-light); font-weight: bold; }
+
+        .nominee-info { flex-grow: 1; padding: 0 15px; font-size: 0.95rem; color: #ccc; }
+
+        .action-col { display: flex; flex-direction: column; align-items: center; min-width: 45px; }
+        .action-label { font-size: 0.6rem; color: var(--gold-dark); margin-bottom: 5px; font-weight: 900; }
+
+        input[type="checkbox"], input[type="radio"] {
+            appearance: none; width: 22px; height: 22px; border: 2px solid #444; cursor: pointer; position: relative; background: #000;
+        }
+        input[type="checkbox"] { border-radius: 4px; }
+        input[type="radio"] { border-radius: 50%; }
+
+        input[type="checkbox"]:checked, input[type="radio"]:checked {
+            background: var(--gold-mid); border-color: var(--gold-light); box-shadow: 0 0 10px var(--gold-mid);
+        }
+        input[type="checkbox"]:checked::after {
+            content: '✓'; position: absolute; color: #000; font-weight: 900; left: 4px; top: -1px;
+        }
+
+        .cat-stats { text-align: center; font-size: 0.8rem; color: #777; padding: 8px; background: #0a0a0a; border-top: 1px solid #222; }
+
+        @media (max-width: 600px) { .ballot-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+    <div class="header-container">
+        <!-- Re-add your actual header image URL here -->
+        <img src="header.png" alt="Oscar Death Race 2026" class="header-img">
+    </div>
+
+    <div class="container">
+        <div class="user-section">
+            <input type="text" id="userName" placeholder="ENTER RACER NAME..." oninput="saveData()">
+            <div>
+                <span class="overall-progress-label" id="progressText">0% COMPLETE</span>
+                <div class="progress-container">
+                    <div id="mainProgressBar" class="progress-bar"></div>
+                </div>
+                <div style="margin-top:15px; color: var(--gold-light); font-weight: bold; font-family: 'Playfair Display';">
+                    <span id="seenCount">0</span> MOVIES WATCHED
+                </div>
+            </div>
+        </div>
+
+        <div id="ballot" class="ballot-grid"></div>
+
+        <p style="text-align: center; color: #444; margin: 40px 0;">MARCH 15, 2026</p>
+    </div>
+
+    <script>
+        const ballotData = [
+            { category: "Best Picture", nominees: ["Bugonia (Focus Features)", "F1 (Apple)", "Frankenstein (Netflix)", "Hamnet (Focus Features)", "Marty Supreme (A24)", "One Battle after Another (Warner Bros.)", "The Secret Agent (Neon)", "Sentimental Value (Neon)", "Sinners (Warner Bros.)", "Train Dreams (Netflix)"] },
+            { category: "Best Director", nominees: ["Chloé Zhao (Hamnet)", "Josh Safdie (Marty Supreme)", "Paul Thomas Anderson (One Battle after Another)", "Joachim Trier (Sentimental Value)", "Ryan Coogler (Sinners)"] },
+            { category: "Best Adapted Screenplay", nominees: ["Bugonia", "Frankenstein", "Hamnet", "One Battle after Another", "Train Dreams"] },
+            { category: "Best Original Screenplay", nominees: ["Blue Moon", "It Was Just an Accident", "Marty Supreme", "Sentimental Value", "Sinners"] },
+            { category: "Best Actor", nominees: ["Timothée Chalamet (Marty Supreme)", "Leonardo DiCaprio (One Battle after Another)", "Ethan Hawke (Blue Moon)", "Michael B. Jordan (Sinners)", "Wagner Moura (The Secret Agent)"] },
+            { category: "Best Supporting Actor", nominees: ["Benicio Del Toro (One Battle after Another)", "Jacob Elordi (Frankenstein)", "Delroy Lindo (Sinners)", "Sean Penn (One Battle after Another)", "Stellan Skarsgård (Sentimental Value)"] },
+            { category: "Best Actress", nominees: ["Jessie Buckley (Hamnet)", "Rose Byrne (If I Had Legs I'd Kick You)", "Kate Hudson (Song Sung Blue)", "Renate Reinsve (Sentimental Value)", "Emma Stone (Bugonia)"] },
+            { category: "Best Supporting Actress", nominees: ["Elle Fanning (Sentimental Value)", "Inga Ibsdotter Lilleaas (Sentimental Value)", "Amy Madigan (Weapons)", "Wunmi Mosaku (Sinners)", "Teyana Taylor (One Battle after Another)"] },
+            { category: "Best Animated Feature", nominees: ["Arco", "Elio", "KPop Demon Hunters", "Little Amélie or the Character of Rain", "Zootopia 2"] },
+            { category: "Best Casting", nominees: ["Hamnet (Nina Gold)", "Marty Supreme (Jennifer Venditti)", "One Battle after Another (Cassandra Kulukundis)", "The Secret Agent (Gabriel Domingues)", "Sinners (Francine Maisler)"] },
+            { category: "Best Cinematography", nominees: ["Frankenstein (Dan Laustsen)", "Marty Supreme (Darius Khondji)", "One Battle after Another (Michael Bauman)", "Sinners (Autumn Durald Arkapaw)", "Train Dreams (Adolpho Veloso)"] },
+            { category: "Best Costume Design", nominees: ["Avatar: Fire and Ash (Deborah L. Scott)", "Frankenstein (Kate Hawley)", "Hamnet (Malgosia Turzanska)", "Marty Supreme (Miyako Bellizzi)", "Sinners (Ruth E. Carter)"] },
+            { category: "Best Documentary Feature", nominees: ["The Alabama Solution", "Come See Me in the Good Light", "Cutting through Rocks", "Mr. Nobody against Putin", "The Perfect Neighbor"] },
+            { category: "Best Documentary Short", nominees: ["All the Empty Rooms", "Armed Only with a Camera", "Children No More", "The Devil Is Busy", "Perfectly a Strangeness"] },
+            { category: "Best Film Editing", nominees: ["F1 (Stephen Mirrione)", "Marty Supreme (Ronald Bronstein)", "One Battle after Another (Andy Jurgensen)", "Sentimental Value (Olivier Bugge Coutté)", "Sinners (Michael P. Shawver)"] },
+            { category: "Best International Feature Film", nominees: ["The Secret Agent (Brazil)", "It Was Just an Accident (France)", "Sentimental Value (Norway)", "Sirat (Spain)", "The Voice of Hind Rajab (Tunisia)"] },
+            { category: "Best Makeup & Hairstyling", nominees: ["Frankenstein", "Kokuho", "Sinners", "The Smashing Machine", "The Ugly Stepsister"] },
+            { category: "Best Original Score", nominees: ["Bugonia (Jerskin Fendrix)", "Frankenstein (Alexandre Desplat)", "Hamnet (Max Richter)", "One Battle after Another (Jonny Greenwood)", "Sinners (Ludwig Goransson)"] },
+            { category: "Best Original Song", nominees: ["Dear Me (Diane Warren: Relentless)", "Golden (KPop Demon Hunters)", "I Lied To You (Sinners)", "Sweet Dreams Of Joy (Viva Verdi!)", "Train Dreams (Train Dreams)"] },
+            { category: "Best Production Design", nominees: ["Frankenstein", "Hamnet", "Marty Supreme", "One Battle after Another", "Sinners"] },
+            { category: "Best Short, Animated", nominees: ["Butterfly", "Forevergreen", "The Girl Who Cried Pearls", "Retirement Plan", "The Three Sisters"] },
+            { category: "Best Short, Live Action", nominees: ["Butcher's Stain", "A Friend of Dorothy", "Jane Austen's Period Drama", "The Singers", "Two People Exchanging Saliva"] },
+            { category: "Best Sound", nominees: ["F1", "Frankenstein", "One Battle after Another", "Sinners", "Sirat"] },
+            { category: "Best Visual Effects", nominees: ["Avatar: Fire and Ash", "F1", "Jurassic World Rebirth", "The Lost Bus", "Sinners"] }
+        ];
+
+        let userData = JSON.parse(localStorage.getItem('oscarDeathRace2026_Global')) || { name: "", seen: [], votes: {} };
+
+        // THE NORMALIZATION ENGINE
+        // Extracts "Sinners" from "Michael B. Jordan (Sinners)" or "Sinners (Warner Bros.)"
+        function getMovieTitle(nominee, category) {
+            const performanceCats = ["Best Director", "Best Actor", "Best Supporting Actor", "Best Actress", "Best Supporting Actress", "Best Casting", "Best Cinematography", "Best Film Editing", "Best Original Score", "Best Original Song"];
+            
+            let title = nominee;
+            if (performanceCats.includes(category)) {
+                const match = nominee.match(/\(([^)]+)\)/);
+                if (match) title = match[1];
+            }
+            if (title.includes('(')) title = title.split('(')[0];
+            return title.trim();
+        }
+
+        function init() {
+            document.getElementById('userName').value = userData.name;
+            renderBallot();
+            updateStats();
+        }
+
+        function renderBallot() {
+            const ballotEl = document.getElementById('ballot');
+            ballotEl.innerHTML = '';
+
+            ballotData.forEach((cat, catIdx) => {
+                const card = document.createElement('div');
+                card.className = 'category-card';
+                
+                let seenInCat = 0;
+                let nomineesHtml = cat.nominees.map(nom => {
+                    const movieTitle = getMovieTitle(nom, cat.category);
+                    const isSeen = userData.seen.includes(movieTitle);
+                    if(isSeen) seenInCat++;
+
+                    const isVoted = userData.votes[cat.category] === nom;
+                    
+                    return `
+                        <div class="nominee-row ${isSeen ? 'seen' : ''}">
+                            <div class="action-col">
+                                <span class="action-label">SEEN</span>
+                                <input type="checkbox" ${isSeen ? 'checked' : ''} onchange="toggleSeen('${movieTitle.replace(/'/g, "\\'")}')">
+                            </div>
+                            <div class="nominee-info">${nom}</div>
+                            <div class="action-col">
+                                <span class="action-label">VOTE</span>
+                                <input type="radio" name="vote-${catIdx}" ${isVoted ? 'checked' : ''} onchange="castVote('${cat.category}', '${nom.replace(/'/g, "\\'")}')">
+                            </div>
+                        </div>`;
+                }).join('');
+
+                card.innerHTML = `
+                    <div class="category-header"><h2>${cat.category}</h2></div>
+                    <div class="nominee-list">${nomineesHtml}</div>
+                    <div class="cat-stats">${seenInCat} / ${cat.nominees.length} SEEN</div>`;
+                ballotEl.appendChild(card);
+            });
+        }
+
+        function toggleSeen(movieTitle) {
+            const index = userData.seen.indexOf(movieTitle);
+            if (index > -1) { userData.seen.splice(index, 1); } 
+            else { userData.seen.push(movieTitle); }
+            saveData();
+            renderBallot(); // Re-render updates all instances of this movie
+            updateStats();
+        }
+
+        function castVote(category, nominee) {
+            userData.votes[category] = nominee;
+            saveData();
+        }
+
+        function saveData() {
+            userData.name = document.getElementById('userName').value;
+            localStorage.setItem('oscarDeathRace2026_Global', JSON.stringify(userData));
+        }
+
+        function updateStats() {
+            const allMovies = new Set();
+            ballotData.forEach(c => c.nominees.forEach(n => allMovies.add(getMovieTitle(n, c.category))));
+            
+            const totalUnique = allMovies.size;
+            const totalSeen = userData.seen.length;
+            const percentage = Math.round((totalSeen / totalUnique) * 100) || 0;
+
+            document.getElementById('mainProgressBar').style.width = percentage + '%';
+            document.getElementById('progressText').innerText = `${percentage}% COMPLETE`;
+            document.getElementById('seenCount').innerText = totalSeen;
+        }
+
+        init();
+    </script>
+</body>
+</html>
